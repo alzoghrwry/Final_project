@@ -41,7 +41,7 @@
 </span>
     </button>
 
-    <!-- Next Button -->
+   
     <button @click="nextSlide"
       class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 group focus:outline-none"
     >

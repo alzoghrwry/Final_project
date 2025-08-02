@@ -72,20 +72,42 @@ const form = ref({
   message: ''
 })
 
-const errors = ref({})
+const errors = ref({
+  name: false,
+  email: false,
+  message: false
+})
 
-const handleSubmit = () => {
-  errors.value = {}
+const validateForm = () => {
+  errors.value.name = !form.value.name
+  errors.value.email = !form.value.email || !/\S+@\S+\.\S+/.test(form.value.email)
+  errors.value.message = !form.value.message
 
-  if (!form.value.name) errors.value.name = true
-  if (!form.value.email || !form.value.email.includes('@')) errors.value.email = true
-  if (!form.value.message) errors.value.message = true
+  return !errors.value.name && !errors.value.email && !errors.value.message
+}
 
-  if (Object.keys(errors.value).length === 0) {
+const handleSubmit = async () => {
+  if (!validateForm()) return
+
+  try {
+    await fetch('http://localhost:3001/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...form.value,
+        read: false,
+        createdAt: new Date().toISOString()
+      })
+    })
+
+    // تصفير النموذج بعد الإرسال
+    form.value = { name: '', email: '', message: '' }
+
     alert('تم إرسال الرسالة بنجاح!')
-    form.value.name = ''
-    form.value.email = ''
-    form.value.message = ''
+  } catch (err) {
+    console.error('فشل في إرسال الرسالة:', err)
+    alert('حدث خطأ أثناء الإرسال، حاول لاحقاً')
   }
 }
 </script>
+
